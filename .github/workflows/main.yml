@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -25,9 +26,20 @@ jobs:
       - name: Build Windows
         run: npm run make
 
-      - name: Upload Windows build
+      - name: Prepare installer
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path release
+          $installer = Get-ChildItem -Path "out\make" -Filter "*Setup.exe" -Recurse | Select-Object -First 1
+          if (-not $installer) {
+            Write-Error "MiladGeo installer was not found."
+            exit 1
+          }
+          Copy-Item $installer.FullName "release\MiladGeo-Setup.exe"
+
+      - name: Upload installer only
         uses: actions/upload-artifact@v4
         with:
-          name: MiladGeo-Windows-Build
-          path: out/**
+          name: MiladGeo-Windows-Installer
+          path: release/MiladGeo-Setup.exe
           if-no-files-found: error
