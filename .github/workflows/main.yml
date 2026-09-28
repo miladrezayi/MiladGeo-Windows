@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: windows-latest
 
+    defaults:
+      run:
+        working-directory: ./MiladGeo-Windows
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,5 +33,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MiladGeo-Windows-Build
-          path: out/**
+          path: MiladGeo-Windows/out/**
           if-no-files-found: error
