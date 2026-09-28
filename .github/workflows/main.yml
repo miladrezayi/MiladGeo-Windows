@@ -11,6 +11,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -18,7 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -30,12 +30,24 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path release
-          $installer = Get-ChildItem -Path "out\make" -Filter "*Setup.exe" -Recurse | Select-Object -First 1
+
+          $installer = Get-ChildItem `
+            -Path "out\make" `
+            -Filter "*Setup.exe" `
+            -Recurse |
+            Select-Object -First 1
+
           if (-not $installer) {
             Write-Error "MiladGeo installer was not found."
             exit 1
           }
-          Copy-Item $installer.FullName "release\MiladGeo-Setup.exe"
+
+          Copy-Item `
+            $installer.FullName `
+            "release\MiladGeo-Setup.exe"
+
+          Write-Host "Installer found:"
+          Write-Host $installer.FullName
 
       - name: Upload installer only
         uses: actions/upload-artifact@v4
